@@ -1,67 +1,94 @@
 "use client"
 
-import type React from "react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card } from "@/components/ui/card"
+import AdminSidebar from "@/components/admin/sidebar"
+import ProjectsManager from "@/components/admin/projects-manager"
+import EventsManager from "@/components/admin/events-manager"
+import CollaboratorsManager from "@/components/admin/collaborators-manager"
+import DashboardOverview from "@/components/admin/dashboard-overview"
+import MessagesManager from "@/components/admin/messages-manager"
+import AdminSettings from "@/components/admin/admin-settings"
+import HeroSettings from "@/components/admin/hero-settings"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
 
-export default function ResetPasswordPage() {
-  const [password, setPassword] = useState("")
-  const [loading, setLoading] = useState(false)
+type AdminTab =
+  | "overview"
+  | "hero"
+  | "projects"
+  | "events"
+  | "collaborators"
+  | "messages"
+  | "settings"
+
+const ADMIN_EMAIL = "sangamkunwar48@gmail.com"
+
+export default function AdminPage() {
+  const [activeTab, setActiveTab] = useState<AdminTab>("overview")
+  const [loading, setLoading] = useState(true)
   const router = useRouter()
-  const { toast } = useToast()
   const supabase = createClient()
+  const { toast } = useToast()
 
-  const handleReset = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
+  useEffect(() => {
+    const init = async () => {
+      const { data } = await supabase.auth.getSession()
+      const user = data.session?.user
 
-    try {
-      const { error } = await supabase.auth.updateUser({ password })
-      if (error) throw error
+      if (!user) {
+        router.replace("/auth/login?redirect=/admin")
+        return
+      }
 
-      toast({
-        title: "Success",
-        description: "Password updated successfully.",
-      })
-      router.push("/auth/login")
-    } catch (err: any) {
-      toast({
-        title: "Error",
-        description: err.message,
-        variant: "destructive",
-      })
-    } finally {
+      if (user.email !== ADMIN_EMAIL) {
+        toast({
+          title: "Access denied",
+          description: "Admin access only",
+          variant: "destructive",
+        })
+        router.replace("/")
+        return
+      }
+
       setLoading(false)
     }
+
+    init()
+  }, [router, supabase, toast])
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.replace("/")
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4">
+        <Skeleton className="h-10 w-10 rounded-full" />
+        <Skeleton className="h-4 w-40" />
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card className="w-full max-w-md p-8">
-        <h1 className="text-2xl font-bold mb-4 text-center">New Password</h1>
-        <p className="text-muted-foreground mb-6 text-center text-sm">Please enter your new password below.</p>
-        <form onSubmit={handleReset} className="space-y-4">
-          <div>
-            <label className="text-sm font-medium">New Password</label>
-            <Input
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-            />
-          </div>
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Updating..." : "Update Password"}
-          </Button>
-        </form>
-      </Card>
+    <div className="flex h-screen">
+      <AdminSidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        onLogout={handleLogout}
+      />
+
+      <main className="flex-1 overflow-y-auto p-8">
+        {activeTab === "overview" && <DashboardOverview />}
+        {activeTab === "hero" && <HeroSettings />}
+        {activeTab === "projects" && <ProjectsManager />}
+        {activeTab === "events" && <EventsManager />}
+        {activeTab === "collaborators" && <CollaboratorsManager />}
+        {activeTab === "messages" && <MessagesManager />}
+        {activeTab === "settings" && <AdminSettings userEmail={ADMIN_EMAIL} />}
+      </main>
     </div>
   )
 }
