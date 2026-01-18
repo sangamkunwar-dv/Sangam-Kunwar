@@ -1,151 +1,162 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Plus, Edit2, Trash2, Calendar } from "lucide-react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { createClient } from "@/lib/supabase/client"
+import { Trash2, Mail, CheckCircle, Clock } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { useToast } from "@/hooks/use-toast"
 
-interface Event {
+interface Message {
   id: string
-  title: string
-  date: string
-  description: string
-  type: "upcoming" | "past"
-  location?: string
+  email: string
+  subject: string
+  message: string
+  status: "pending" | "approved" | "rejected" | "unread" | "read"
+  created_at: string
 }
 
-export default function EventsManager() {
-  const [events, setEvents] = useState<Event[]>([])
+export default function MessagesManager() {
+  const [messages, setMessages] = useState<Message[]>([])
   const [loading, setLoading] = useState(true)
-  const [showForm, setShowForm] = useState(false)
-  const [editingId, setEditingId] = useState<string | null>(null)
-  const [formData, setFormData] = useState<Partial<Event>>({ type: "upcoming" })
+  const { toast } = useToast()
+  const supabase = createClient()
 
   useEffect(() => {
-    fetch("/api/events")
-      .then((res) => res.json())
-      .then(setEvents)
-      .finally(() => setLoading(false))
+    fetchMessages()
   }, [])
 
-  const saveEvent = async () => {
-    if (!formData.title || !formData.date) return alert("Title and date required")
+  const fetchMessages = async () => {
+    try {
+      const { data, error } = await supabase.from("messages").select("*").order("created_at", { ascending: false })
 
-    const res = await fetch("/api/admin/events", {
-      method: editingId ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...formData, id: editingId }),
-    })
-
-    const data = await res.json()
-    if (!res.ok) return alert(data.message)
-
-    setEvents((prev) =>
-      editingId ? prev.map((e) => (e.id === editingId ? data : e)) : [...prev, data],
-    )
-
-    resetForm()
+      if (error) {
+        const response = await fetch("/api/contact")
+        const result = await response.json()
+        setMessages(result.messages || [])
+      } else {
+        setMessages(data || [])
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      })
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const deleteEvent = async (id: string) => {
-    if (!confirm("Delete event?")) return
-    await fetch(`/api/admin/events?id=${id}`, { method: "DELETE" })
-    setEvents((prev) => prev.filter((e) => e.id !== id))
+  const handleDelete = async (id: string) => {
+    try {
+      const { error } = await supabase.from("messages").delete().eq("id", id)
+
+      if (error) throw error
+
+      setMessages(messages.filter((m) => m.id !== id))
+      toast({
+        title: "Success",
+        description: "Message deleted",
+      })
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      })
+    }
   }
 
-  const resetForm = () => {
-    setFormData({ type: "upcoming" })
-    setEditingId(null)
-    setShowForm(false)
+  const handleApprove = async (id: string) => {
+    try {
+      const { error } = await supabase.from("messages").update({ status: "approved" }).eq("id", id)
+
+      if (error) throw error
+
+      setMessages(messages.map((m) => (m.id === id ? { ...m, status: "approved" } : m)))
+      toast({
+        title: "Success",
+        description: "Message approved",
+      })
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      })
+    }
   }
 
-  if (loading) return <p>Loading events...</p>
+  const handleReply = (email: string) => {
+    window.location.href = `mailto:${email}`
+  }
 
-  const upcoming = events.filter((e) => e.type === "upcoming")
-  const past = events.filter((e) => e.type === "past")
+  if (loading) {
+    return <div className="text-center py-8">Loading messages...</div>
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between">
-        <h1 className="text-3xl font-bold">Events</h1>
-        <button onClick={() => setShowForm(true)} className="bg-primary px-4 py-2 rounded text-white">
-          <Plus size={18} /> Add Event
-        </button>
+      <div>
+        <h1 className="text-3xl font-bold text-foreground">Messages</h1>
+        <p className="text-muted-foreground">Manage visitor messages and inquiries</p>
       </div>
 
-      {showForm && (
+      {messages.length === 0 ? (
         <Card>
-          <CardHeader>
-            <CardTitle>{editingId ? "Edit" : "Add"} Event</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <input
-              placeholder="Title"
-              value={formData.title || ""}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full p-2 border rounded"
-            />
-            <input
-              type="date"
-              value={formData.date || ""}
-              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              className="w-full p-2 border rounded"
-            />
-            <select
-              value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-              className="w-full p-2 border rounded"
-            >
-              <option value="upcoming">Upcoming</option>
-              <option value="past">Past</option>
-            </select>
-            <textarea
-              placeholder="Description"
-              value={formData.description || ""}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full p-2 border rounded"
-            />
-            <button onClick={saveEvent} className="bg-primary text-white py-2 rounded">
-              Save
-            </button>
+          <CardContent className="py-12 text-center">
+            <Mail size={48} className="mx-auto text-muted-foreground mb-4 opacity-50" />
+            <p className="text-muted-foreground">No messages yet</p>
           </CardContent>
         </Card>
+      ) : (
+        <div className="grid gap-4">
+          {messages.map((msg) => (
+            <Card key={msg.id}>
+              <CardContent className="pt-6">
+                <div className="space-y-4">
+                  <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-lg font-semibold text-foreground">{msg.subject}</h3>
+                        {msg.status === "approved" && <CheckCircle size={18} className="text-green-500" />}
+                        {msg.status === "pending" && <Clock size={18} className="text-yellow-500" />}
+                      </div>
+                      <p className="text-sm text-muted-foreground mt-1">From: {msg.email}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {new Date(msg.created_at || Date.now()).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      {msg.status === "pending" && (
+                        <Button size="sm" onClick={() => handleApprove(msg.id)} className="gap-2">
+                          <CheckCircle size={16} />
+                          Approve
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleReply(msg.email)}
+                        className="bg-transparent"
+                      >
+                        Reply
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => handleDelete(msg.id)}>
+                        <Trash2 size={18} className="text-destructive" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="bg-muted/50 p-4 rounded-lg">
+                    <p className="text-foreground whitespace-pre-wrap">{msg.message}</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       )}
-
-      {upcoming.map((e) => (
-        <EventCard key={e.id} event={e} onEdit={() => { setEditingId(e.id); setFormData(e); setShowForm(true) }} onDelete={() => deleteEvent(e.id)} />
-      ))}
-
-      {past.map((e) => (
-        <EventCard key={e.id} event={e} past onEdit={() => { setEditingId(e.id); setFormData(e); setShowForm(true) }} onDelete={() => deleteEvent(e.id)} />
-      ))}
     </div>
-  )
-}
-
-function EventCard({
-  event,
-  past,
-  onEdit,
-  onDelete,
-}: {
-  event: Event
-  past?: boolean
-  onEdit: () => void
-  onDelete: () => void
-}) {
-  return (
-    <Card className={past ? "opacity-70" : ""}>
-      <CardContent className="pt-6 flex justify-between">
-        <div>
-          <h3 className="font-bold">{event.title}</h3>
-          <p className="text-sm">{event.date}</p>
-          <p>{event.description}</p>
-        </div>
-        <div className="flex gap-2">
-          <button onClick={onEdit}><Edit2 size={16} /></button>
-          <button onClick={onDelete}><Trash2 size={16} /></button>
-        </div>
-      </CardContent>
-    </Card>
   )
 }

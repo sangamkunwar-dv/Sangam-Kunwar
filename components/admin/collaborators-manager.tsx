@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { Plus, Edit2, Trash2, Github, Linkedin, Mail } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -12,122 +12,268 @@ interface Collaborator {
   socialLinks?: { platform: string; url: string }[]
 }
 
+const initialCollaborators: Collaborator[] = [
+  {
+    id: "1",
+    name: "Alex Johnson",
+    role: "Full Stack Developer",
+    bio: "Passionate about building scalable web applications",
+    socialLinks: [
+      { platform: "github", url: "#" },
+      { platform: "linkedin", url: "#" },
+    ],
+  },
+  {
+    id: "2",
+    name: "Sarah Chen",
+    role: "UI/UX Designer",
+    bio: "Creating beautiful and intuitive user experiences",
+    socialLinks: [{ platform: "linkedin", url: "#" }],
+  },
+]
+
 export default function CollaboratorsManager() {
-  const [collaborators, setCollaborators] = useState<Collaborator[]>([])
-  const [loading, setLoading] = useState(true)
+  const [collaborators, setCollaborators] = useState<Collaborator[]>(initialCollaborators)
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [formData, setFormData] = useState<Partial<Collaborator>>({})
+  const [formData, setFormData] = useState<Partial<Collaborator>>({
+    name: "",
+    role: "",
+    bio: "",
+    socialLinks: [],
+  })
+  const [socialPlatform, setSocialPlatform] = useState("github")
+  const [socialUrl, setSocialUrl] = useState("")
 
-  /* LOAD COLLABORATORS */
-  useEffect(() => {
-    fetch("/api/collaborators")
-      .then((res) => res.json())
-      .then(setCollaborators)
-      .finally(() => setLoading(false))
-  }, [])
-
-  const saveCollaborator = async () => {
-    if (!formData.name || !formData.role) {
-      return alert("Name and role required")
+  const handleAddCollaborator = () => {
+    if (!formData.name?.trim() || !formData.role?.trim()) {
+      alert("Name and role are required")
+      return
     }
-
-    const res = await fetch("/api/admin/collaborators", {
-      method: editingId ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...formData, id: editingId }),
-    })
-
-    const data = await res.json()
-    if (!res.ok) return alert(data.message)
 
     if (editingId) {
-      setCollaborators((prev) => prev.map((c) => (c.id === editingId ? data : c)))
+      setCollaborators(
+        collaborators.map((c) => (c.id === editingId ? ({ ...formData, id: editingId } as Collaborator) : c)),
+      )
+      setEditingId(null)
     } else {
-      setCollaborators((prev) => [...prev, data])
+      setCollaborators([...collaborators, { ...formData, id: Date.now().toString() } as Collaborator])
     }
-
     resetForm()
   }
 
-  const deleteCollaborator = async (id: string) => {
-    if (!confirm("Delete collaborator?")) return
-
-    await fetch(`/api/admin/collaborators?id=${id}`, { method: "DELETE" })
-    setCollaborators((prev) => prev.filter((c) => c.id !== id))
-  }
-
   const resetForm = () => {
-    setFormData({})
-    setEditingId(null)
+    setFormData({ name: "", role: "", bio: "", socialLinks: [] })
+    setSocialPlatform("github")
+    setSocialUrl("")
     setShowForm(false)
   }
 
-  const icon = (p: string) =>
-    p === "github" ? <Github size={16} /> : p === "linkedin" ? <Linkedin size={16} /> : <Mail size={16} />
+  const handleEdit = (collaborator: Collaborator) => {
+    setFormData(collaborator)
+    setEditingId(collaborator.id)
+    setShowForm(true)
+  }
 
-  if (loading) return <p>Loading collaborators...</p>
+  const handleDelete = (id: string) => {
+    if (confirm("Are you sure you want to delete this collaborator?")) {
+      setCollaborators(collaborators.filter((c) => c.id !== id))
+    }
+  }
+
+  const addSocialLink = () => {
+    if (socialUrl.trim()) {
+      setFormData({
+        ...formData,
+        socialLinks: [...(formData.socialLinks || []), { platform: socialPlatform, url: socialUrl.trim() }],
+      })
+      setSocialUrl("")
+    }
+  }
+
+  const removeSocialLink = (platform: string) => {
+    setFormData({
+      ...formData,
+      socialLinks: (formData.socialLinks || []).filter((link) => link.platform !== platform),
+    })
+  }
+
+  const getSocialIcon = (platform: string) => {
+    switch (platform) {
+      case "github":
+        return <Github size={16} />
+      case "linkedin":
+        return <Linkedin size={16} />
+      case "email":
+        return <Mail size={16} />
+      default:
+        return null
+    }
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between">
-        <h1 className="text-3xl font-bold">Collaborators</h1>
-        <button onClick={() => setShowForm(true)} className="bg-primary px-4 py-2 rounded text-white">
-          <Plus size={18} /> Add
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">Collaborators</h1>
+          <p className="text-muted-foreground">Manage your team and collaborators</p>
+        </div>
+        <button
+          onClick={() => {
+            if (showForm) {
+              resetForm()
+            } else {
+              setShowForm(true)
+            }
+          }}
+          className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+        >
+          <Plus size={20} />
+          Add Collaborator
         </button>
       </div>
 
       {showForm && (
         <Card>
           <CardHeader>
-            <CardTitle>{editingId ? "Edit" : "Add"} Collaborator</CardTitle>
+            <CardTitle>{editingId ? "Edit Collaborator" : "Add New Collaborator"}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            <input
-              placeholder="Name"
-              value={formData.name || ""}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full p-2 border rounded"
-            />
-            <input
-              placeholder="Role"
-              value={formData.role || ""}
-              onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-              className="w-full p-2 border rounded"
-            />
-            <textarea
-              placeholder="Bio"
-              value={formData.bio || ""}
-              onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-              className="w-full p-2 border rounded"
-            />
-            <button onClick={saveCollaborator} className="bg-primary text-white py-2 rounded">
-              Save
-            </button>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">Name</label>
+                <input
+                  type="text"
+                  value={formData.name || ""}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground"
+                  placeholder="Full name"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">Role</label>
+                <input
+                  type="text"
+                  value={formData.role || ""}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground"
+                  placeholder="Job title or role"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">Bio</label>
+              <textarea
+                value={formData.bio || ""}
+                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground"
+                placeholder="Short bio or description"
+                rows={3}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">Social Links</label>
+              <div className="flex gap-2 mb-2">
+                <select
+                  value={socialPlatform}
+                  onChange={(e) => setSocialPlatform(e.target.value)}
+                  className="px-4 py-2 rounded-lg border border-border bg-background text-foreground"
+                >
+                  <option value="github">GitHub</option>
+                  <option value="linkedin">LinkedIn</option>
+                  <option value="email">Email</option>
+                </select>
+                <input
+                  type="url"
+                  value={socialUrl}
+                  onChange={(e) => setSocialUrl(e.target.value)}
+                  className="flex-1 px-4 py-2 rounded-lg border border-border bg-background text-foreground"
+                  placeholder="URL"
+                />
+                <button
+                  onClick={addSocialLink}
+                  className="px-4 py-2 bg-secondary text-foreground rounded-lg hover:opacity-90"
+                >
+                  Add
+                </button>
+              </div>
+              <div className="space-y-1">
+                {(formData.socialLinks || []).map((link) => (
+                  <div key={link.platform} className="flex justify-between items-center bg-muted/50 p-2 rounded">
+                    <span className="text-sm flex items-center gap-2">
+                      {getSocialIcon(link.platform)}
+                      {link.platform}: {link.url}
+                    </span>
+                    <button
+                      onClick={() => removeSocialLink(link.platform)}
+                      className="text-xs text-destructive hover:font-bold"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                onClick={handleAddCollaborator}
+                className="flex-1 bg-primary text-primary-foreground py-2 rounded-lg hover:opacity-90 transition-opacity"
+              >
+                {editingId ? "Update" : "Add"} Collaborator
+              </button>
+              <button
+                onClick={resetForm}
+                className="flex-1 bg-secondary text-foreground py-2 rounded-lg hover:opacity-90 transition-opacity"
+              >
+                Cancel
+              </button>
+            </div>
           </CardContent>
         </Card>
       )}
 
-      <div className="grid md:grid-cols-2 gap-4">
-        {collaborators.map((c) => (
-          <Card key={c.id}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {collaborators.map((collaborator) => (
+          <Card key={collaborator.id}>
             <CardContent className="pt-6">
-              <h3 className="font-bold">{c.name}</h3>
-              <p className="text-primary">{c.role}</p>
-              <p className="text-sm">{c.bio}</p>
-              <div className="flex gap-2 mt-2">
-                {c.socialLinks?.map((s) => (
-                  <a key={s.platform} href={s.url}>{icon(s.platform)}</a>
-                ))}
+              <div className="flex justify-between items-start mb-3">
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground">{collaborator.name}</h3>
+                  <p className="text-sm text-primary font-medium">{collaborator.role}</p>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(collaborator)}
+                    className="p-2 hover:bg-secondary rounded-lg transition-colors"
+                  >
+                    <Edit2 size={18} className="text-foreground" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(collaborator.id)}
+                    className="p-2 hover:bg-destructive/10 rounded-lg transition-colors"
+                  >
+                    <Trash2 size={18} className="text-destructive" />
+                  </button>
+                </div>
               </div>
-              <div className="flex gap-2 mt-3">
-                <button onClick={() => { setEditingId(c.id); setFormData(c); setShowForm(true) }}>
-                  <Edit2 size={16} />
-                </button>
-                <button onClick={() => deleteCollaborator(c.id)}>
-                  <Trash2 size={16} />
-                </button>
-              </div>
+              {collaborator.bio && <p className="text-sm text-muted-foreground mb-3">{collaborator.bio}</p>}
+              {collaborator.socialLinks && collaborator.socialLinks.length > 0 && (
+                <div className="flex gap-2">
+                  {collaborator.socialLinks.map((link) => (
+                    <a
+                      key={link.platform}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 hover:bg-secondary rounded-lg transition-colors text-foreground"
+                    >
+                      {getSocialIcon(link.platform)}
+                    </a>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
