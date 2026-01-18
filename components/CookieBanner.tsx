@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { event } from "@vercel/analytics"
 
 export default function CookieBanner() {
   const [accepted, setAccepted] = useState(false)
@@ -13,19 +14,26 @@ export default function CookieBanner() {
   }, [])
 
   const acceptCookies = () => {
-    // Set cookie for 30 days
+    // ✅ Set cookie for 30 days
     document.cookie = "cookiesAccepted=true; path=/; max-age=" + 60 * 60 * 24 * 30
     setAccepted(true)
+
+    // ✅ Track event in Vercel Analytics
+    if (event) {
+      event("cookie_accepted", { category: "engagement", label: "User accepted cookies" })
+    }
   }
 
   if (accepted) return null // Hide banner if accepted
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-gray-900 text-white p-4 flex justify-between items-center z-50">
-      <span>We use cookies to improve your experience on our website.</span>
+    <div className="fixed bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6 bg-gray-900 text-white rounded-lg shadow-lg p-4 md:p-6 flex flex-col md:flex-row justify-between items-center gap-3 z-50 animate-fadeIn">
+      <span className="text-sm md:text-base">
+        We use cookies to improve your experience on our website. By clicking "Accept", you consent to our use of cookies.
+      </span>
       <button
         onClick={acceptCookies}
-        className="bg-blue-500 px-3 py-1 rounded hover:bg-blue-600"
+        className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md shadow transition duration-300"
       >
         Accept
       </button>
