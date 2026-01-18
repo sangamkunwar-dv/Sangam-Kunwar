@@ -25,7 +25,7 @@ export default function Hero() {
         const response = await fetch("/api/hero-settings")
         if (!response.ok) throw new Error("Failed to fetch hero settings")
         const data = await response.json()
-        console.log("[v0] Hero settings loaded:", data)
+        console.log("[sangamkunwar] Hero settings loaded:", data)
         setHero(data)
       } catch (error) {
         console.error("[v0] Error fetching hero settings:", error)
@@ -35,7 +35,7 @@ export default function Hero() {
           title: "I'm Sangam Kunwar",
           subtitle: "Full-Stack Developer & Designer",
           description: "I'm passionate about building beautiful, functional web applications. With expertise in modern technologies and a focus on user experience, I create solutions that make an impact.",
-          photo_url: "/images/sangamkunwar-photo.jpg",
+          photo_url: "/sangamkunwarphoto.png",
           logo_url: "",
         })
       } finally {
