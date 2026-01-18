@@ -5,6 +5,9 @@ import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 
+// ✅ Import CookieBanner
+import CookieBanner from "@/components/CookieBanner"
+
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-geist-sans",
@@ -42,6 +45,9 @@ export default function RootLayout({
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
+
+          {/* ✅ Add CookieBanner here */}
+          <CookieBanner />
         </ThemeProvider>
         <Analytics />
       </body>
