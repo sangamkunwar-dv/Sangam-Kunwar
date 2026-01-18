@@ -16,6 +16,7 @@ export default function SignupPage() {
   const [password, setPassword] = useState("")
   const [fullName, setFullName] = useState("")
   const [loading, setLoading] = useState(false)
+
   const router = useRouter()
   const { toast } = useToast()
   const supabase = createClient()
@@ -25,8 +26,8 @@ export default function SignupPage() {
     setLoading(true)
 
     try {
-      console.log("[v0] Attempting signup for:", email)
-      
+      console.log("[Sangam Kunwar] Attempting signup for:", email)
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -39,7 +40,7 @@ export default function SignupPage() {
       })
 
       if (error) {
-        console.error("[v0] Signup error:", error)
+        console.error("[Sangam Kunwar] Signup error:", error)
         toast({
           title: "Signup Failed",
           description: error.message,
@@ -49,19 +50,20 @@ export default function SignupPage() {
       }
 
       if (data.user) {
-        console.log("[v0] Signup successful, email confirmation required")
+        console.log("[Sangam Kunwar] Signup successful – email verification required")
+
         toast({
           title: "Account Created!",
-          description: "Please check your email and click the verification link to activate your account.",
+          description:
+            "Please check your email and click the verification link to activate your account.",
         })
-        
-        // Redirect to verification page after a moment
+
         setTimeout(() => {
           router.push("/auth/verify-email")
         }, 1500)
       }
     } catch (err) {
-      console.error("[v0] Unexpected signup error:", err)
+      console.error("[Sangam Kunwar] Unexpected signup error:", err)
       toast({
         title: "Error",
         description: "An unexpected error occurred during signup",
@@ -86,7 +88,9 @@ export default function SignupPage() {
 
           <div className="text-center">
             <h1 className="text-3xl font-bold">Create Account</h1>
-            <p className="text-muted-foreground mt-2">Join to send me messages</p>
+            <p className="text-muted-foreground mt-2">
+              Join to send me messages
+            </p>
           </div>
 
           <form onSubmit={handleSignup} className="space-y-4">
@@ -131,7 +135,10 @@ export default function SignupPage() {
           <div className="text-center text-sm">
             <p className="text-muted-foreground">
               Already have an account?{" "}
-              <Link href="/auth/login" className="text-primary hover:underline font-medium">
+              <Link
+                href="/auth/login"
+                className="text-primary hover:underline font-medium"
+              >
                 Sign in
               </Link>
             </p>

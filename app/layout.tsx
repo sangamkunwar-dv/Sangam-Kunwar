@@ -5,24 +5,44 @@ import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 
-const _geist = Geist({ subsets: ["latin"] })
-const _geistMono = Geist_Mono({ subsets: ["latin"] })
+const geist = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist-sans",
+})
+
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
+})
 
 export const metadata: Metadata = {
-  title: "Sangam Kunwar - Portfolio",
-  description: "Professional portfolio of Sangam Kunwar - Full Stack Developer",
-    generator: 'v0.app'
+  title: {
+    default: "Sangam Kunwar – Full Stack Developer",
+    template: "%s | Sangam Kunwar",
+  },
+  description: "Professional portfolio of Sangam Kunwar – Full Stack Developer",
+  generator: "sangamkunwar",
+
+  icons: {
+    icon: "https://sangamkunwar.netlify.app/sangamkunwarphoto.png",
+    shortcut: "https://sangamkunwar.netlify.app/sangamkunwarphoto.png",
+    apple: "https://sangamkunwar.netlify.app/sangamkunwarphoto.png",
+  },
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`font-sans antialiased`}>
-        <ThemeProvider>{children}</ThemeProvider>
+      <body
+        className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}
+      >
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>

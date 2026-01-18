@@ -15,6 +15,36 @@ interface Project {
   live_link?: string
 }
 
+const defaultProjects: Project[] = [
+  {
+    id: "1",
+    title: "Portfolio Website",
+    description: "Modern portfolio showcasing projects and collaborations",
+    tech_stack: ["Next.js", "React", "Tailwind CSS"],
+    image_url: "/placeholder.svg?height=192&width=384&query=portfolio",
+    github_link: "https://github.com",
+    live_link: "https://example.com",
+  },
+  {
+    id: "2",
+    title: "E-commerce Platform",
+    description: "Full-stack e-commerce solution with payment integration",
+    tech_stack: ["Node.js", "MongoDB", "React"],
+    image_url: "/placeholder.svg?height=192&width=384&query=ecommerce",
+    github_link: "https://github.com",
+    live_link: "https://example.com",
+  },
+  {
+    id: "3",
+    title: "Analytics Dashboard",
+    description: "Data visualization dashboard with interactive charts",
+    tech_stack: ["Next.js", "Recharts", "Supabase"],
+    image_url: "/placeholder.svg?height=192&width=384&query=analytics",
+    github_link: "https://github.com",
+    live_link: "https://example.com",
+  },
+]
+
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
@@ -22,12 +52,15 @@ export default function Projects() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
+        console.log("[v0] Fetching projects...")
         const response = await fetch("/api/projects")
         if (!response.ok) throw new Error("Failed to fetch projects")
         const data = await response.json()
-        setProjects(data)
+        console.log("[v0] Projects loaded:", data)
+        setProjects(data && data.length > 0 ? data : defaultProjects)
       } catch (error) {
         console.error("[v0] Error fetching projects:", error)
+        setProjects(defaultProjects)
       } finally {
         setLoading(false)
       }

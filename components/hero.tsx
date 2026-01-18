@@ -1,8 +1,63 @@
+"use client"
+
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Loader } from "lucide-react"
 import Image from "next/image"
 
+interface HeroSettings {
+  id: string
+  title: string
+  subtitle: string
+  description: string
+  photo_url: string
+  logo_url: string
+}
+
 export default function Hero() {
+  const [hero, setHero] = useState<HeroSettings | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchHeroSettings = async () => {
+      try {
+        console.log("[v0] Fetching hero settings...")
+        const response = await fetch("/api/hero-settings")
+        if (!response.ok) throw new Error("Failed to fetch hero settings")
+        const data = await response.json()
+        console.log("[v0] Hero settings loaded:", data)
+        setHero(data)
+      } catch (error) {
+        console.error("[v0] Error fetching hero settings:", error)
+        // Fallback to default
+        setHero({
+          id: "default",
+          title: "I'm Sangam Kunwar",
+          subtitle: "Full-Stack Developer & Designer",
+          description: "I'm passionate about building beautiful, functional web applications. With expertise in modern technologies and a focus on user experience, I create solutions that make an impact.",
+          photo_url: "/images/sangamkunwar-photo.jpg",
+          logo_url: "",
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchHeroSettings()
+  }, [])
+
+  if (loading) {
+    return (
+      <section className="py-20 sm:py-32 flex items-center justify-center">
+        <Loader className="animate-spin" />
+      </section>
+    )
+  }
+
+  if (!hero) {
+    return null
+  }
+
   return (
     <section id="about" className="relative overflow-hidden py-20 sm:py-32">
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5 pointer-events-none" />
@@ -14,14 +69,13 @@ export default function Hero() {
             <div className="space-y-2">
               <p className="text-sm font-semibold text-primary uppercase tracking-wider">Welcome to my portfolio</p>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-balance leading-tight">
-                I'm Sangam Kunwar
+                {hero.title}
               </h1>
-              <p className="text-xl text-primary font-semibold">Full-Stack Developer & Designer</p>
+              <p className="text-xl text-primary font-semibold">{hero.subtitle}</p>
             </div>
 
             <p className="text-lg text-muted-foreground leading-relaxed max-w-lg">
-              I'm passionate about building beautiful, functional web applications. With expertise in modern
-              technologies and a focus on user experience, I create solutions that make an impact.
+              {hero.description}
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
@@ -61,11 +115,11 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Right Image - Added your photo */}
+          {/* Right Image */}
           <div className="relative h-96 sm:h-full min-h-96 rounded-2xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 border border-border flex items-center justify-center group hover:shadow-2xl transition-all duration-500 animate-in fade-in slide-in-from-right-4 duration-700 delay-200">
             <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sangamkunwar-photo-GXq7pe8eUe2K2gZjVFHR0dsmMu91d4.jpg"
-              alt="Sangam Kunwar"
+              src={hero.photo_url || "/placeholder.svg"}
+              alt={hero.title}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
               priority

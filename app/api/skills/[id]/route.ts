@@ -5,8 +5,8 @@ import { type NextRequest, NextResponse } from "next/server"
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const cookieStore = await cookies()
   const supabase = createServerClient(
-    process.env.SUPABASE_NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
@@ -38,8 +38,8 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const cookieStore = await cookies()
   const supabase = createServerClient(
-    process.env.SUPABASE_NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         getAll() {
