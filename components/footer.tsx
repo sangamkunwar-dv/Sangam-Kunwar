@@ -10,7 +10,7 @@ export default function Footer() {
       label: "LinkedIn",
     },
     { icon: Github, href: "https://github.com/sangamkunwar-dv", label: "GitHub" },
-    { icon: Mail, href: "mailto:sangamkunwae48@gmail.com", label: "Email" },
+    { icon: Mail, href: "mailto:sangamkunwar48@gmail.com", label: "Email" },
   ]
 
   return (
@@ -31,8 +31,8 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2 text-muted-foreground">
                 <Mail size={16} />
-                <a href="mailto:sangamkunwae48@gmail.com" className="hover:text-foreground transition-colors">
-                  sangamkunwae48@gmail.com
+                <a href="mailto:sangamkunwar48@gmail.com" className="hover:text-foreground transition-colors">
+                  sangamkunwar48@gmail.com
                 </a>
               </li>
               <li className="flex items-center gap-2 text-muted-foreground">
