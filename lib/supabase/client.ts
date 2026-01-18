@@ -16,4 +16,3 @@ export function createClient() {
   }
 
   return createBrowserClient(url, key)
-}
