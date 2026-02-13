@@ -18,15 +18,6 @@ interface Project {
 const defaultProjects: Project[] = [
   {
     id: "1",
-    title: "Portfolio Website",
-    description: "Modern portfolio showcasing projects and collaborations",
-    tech_stack: ["Next.js", "React", "Tailwind CSS"],
-    image_url: "/analytics-dashboard-charts.png?height=192&width=384&query=portfolio",
-    github_link: "https://github.com",
-    live_link: "https://example.com",
-  },
-  {
-    id: "2",
     title: "E-commerce Platform",
     description: "Full-stack e-commerce solution with payment integration",
     tech_stack: ["Node.js", "MongoDB", "React"],
@@ -35,7 +26,7 @@ const defaultProjects: Project[] = [
     live_link: "https://example.com",
   },
   {
-    id: "3",
+    id: "2",
     title: "Analytics Dashboard",
     description: "Data visualization dashboard with interactive charts",
     tech_stack: ["Next.js", "Recharts", "Supabase"],
