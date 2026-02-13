@@ -27,9 +27,9 @@ export const metadata: Metadata = {
   generator: "sangamkunwar",
 
   icons: {
-    icon: "https://sangamkunwar.netlify.app/sangamkunwarphoto.png",
-    shortcut: "https://sangamkunwar.netlify.app/sangamkunwarphoto.png",
-    apple: "https://sangamkunwar.netlify.app/sangamkunwarphoto.png",
+    icon: "https://sangamkunwars.netlify.app/sangamkunwarphoto.png",
+    shortcut: "https://sangamkunwars.netlify.app/sangamkunwarphoto.png",
+    apple: "https://sangamkunwars.netlify.app/sangamkunwarphoto.png",
   },
 }
 
