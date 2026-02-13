@@ -1,22 +1,25 @@
-import type React from "react"
-import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
-import { ThemeProvider } from "@/components/theme-provider"
-import "./globals.css"
+import type React from "react";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { ThemeProvider } from "@/components/theme-provider";
+import "./globals.css";
 
 // ✅ Import CookieBanner
-import CookieBanner from "@/components/CookieBanner"
+import CookieBanner from "@/components/CookieBanner";
+
+// ✅ Import ThemeImage
+import ThemeImage from "@/components/ThemeImage";
 
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-geist-sans",
-})
+});
 
 const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-geist-mono",
-})
+});
 
 export const metadata: Metadata = {
   title: {
@@ -25,32 +28,38 @@ export const metadata: Metadata = {
   },
   description: "Professional portfolio of Sangam Kunwar – Full Stack Developer",
   generator: "sangamkunwar",
-
   icons: {
     icon: "https://sangamkunwar.netlify.app/sangamkunwarphoto.png",
     shortcut: "https://sangamkunwar.netlify.app/sangamkunwarphoto.png",
     apple: "https://sangamkunwar.netlify.app/sangamkunwarphoto.png",
   },
-}
+};
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}
-      >
+      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          
+          {/* ✅ Theme-based image */}
+          <div className="flex justify-center my-6">
+            <ThemeImage
+              lightSrc="https://sangamkunwar.netlify.app/sangamkunwarphoto.png"
+              darkSrc="public\apple-icon.png"
+              alt="Profile Photo"
+              className="w-32 h-32 rounded-full"
+            />
+          </div>
+
+          {/* ✅ Page content */}
           {children}
 
-          {/* ✅ Add CookieBanner here */}
+          {/* ✅ CookieBanner */}
           <CookieBanner />
         </ThemeProvider>
+
         <Analytics />
       </body>
     </html>
-  )
+  );
 }
