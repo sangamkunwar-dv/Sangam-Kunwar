@@ -24,7 +24,7 @@ export default function Header() {
           <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary">
               <Image
-                src="https://sangamkunwar.netlify.app/sangamkunwarphoto.png"
+                src="https://sangamkunwars.netlify.app/sangamkunwarphoto.png"
                 alt="Sangam Kunwar"
                 width={40}
                 height={40}
