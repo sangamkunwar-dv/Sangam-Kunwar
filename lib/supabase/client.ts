@@ -14,6 +14,6 @@ export function createClient() {
   } else {
     console.log("[v0] ✅ Supabase client initialized")
   }
-
+)
   return createBrowserClient(url, key)
 }
