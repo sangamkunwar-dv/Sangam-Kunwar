@@ -7,37 +7,63 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/hooks/use-toast"
 import { CheckCircle, AlertCircle, ArrowLeft } from "lucide-react"
+import { createClient } from "@/lib/supabase/client"
 
-export default function VerifyEmailPage() {
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading")
+export default function ResetPasswordPage() {
   const router = useRouter()
   const { toast } = useToast()
+  const supabase = createClient()
 
+  const [status, setStatus] = useState<"loading" | "form" | "success" | "error">("loading")
+  const [password, setPassword] = useState("")
+  const [token, setToken] = useState("")
+
+  // Get token from URL
   useEffect(() => {
-    // Check if email verification was successful
-    const checkVerification = async () => {
-      try {
-        // Get the hash from URL (Supabase sends verification token in URL)
-        const hash = window.location.hash
-        if (hash) {
-          // Wait a moment for Supabase to process the verification
-          await new Promise((resolve) => setTimeout(resolve, 2000))
-          setStatus("success")
-          toast({
-            title: "Email Verified",
-            description: "Your email has been verified successfully. You can now log in.",
-          })
-        } else {
-          setStatus("loading")
-        }
-      } catch (err) {
-        console.error("[v0] Verification error:", err)
-        setStatus("error")
-      }
-    }
+    const params = new URLSearchParams(window.location.search)
+    const accessToken = params.get("access_token") || params.get("token")
+    const type = params.get("type")
 
-    checkVerification()
-  }, [toast])
+    if (accessToken && type === "recovery") {
+      setToken(accessToken)
+      setStatus("form")
+    } else {
+      setStatus("error")
+    }
+  }, [])
+
+  // Handle password reset
+  const handleReset = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setStatus("loading")
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password,
+      }, {
+        // Pass the token received in URL
+        accessToken: token,
+      })
+
+      if (error) {
+        console.error("Reset error:", error)
+        setStatus("error")
+        toast({
+          title: "Reset Failed",
+          description: error.message,
+        })
+      } else {
+        setStatus("success")
+        toast({
+          title: "Password Reset",
+          description: "Your password has been updated successfully!",
+        })
+      }
+    } catch (err) {
+      console.error(err)
+      setStatus("error")
+    }
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
@@ -57,8 +83,27 @@ export default function VerifyEmailPage() {
                 <div className="flex justify-center mb-4">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                 </div>
-                <h1 className="text-2xl font-bold">Verifying Email</h1>
-                <p className="text-muted-foreground mt-2">Please wait while we verify your email...</p>
+                <h1 className="text-2xl font-bold">Processing...</h1>
+                <p className="text-muted-foreground mt-2">Please wait...</p>
+              </>
+            )}
+
+            {status === "form" && (
+              <>
+                <h1 className="text-2xl font-bold mb-4">Reset Your Password</h1>
+                <form onSubmit={handleReset} className="space-y-4">
+                  <input
+                    type="password"
+                    placeholder="Enter new password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="w-full p-2 border rounded"
+                  />
+                  <Button type="submit" className="w-full">
+                    Reset Password
+                  </Button>
+                </form>
               </>
             )}
 
@@ -67,8 +112,10 @@ export default function VerifyEmailPage() {
                 <div className="flex justify-center mb-4">
                   <CheckCircle className="w-12 h-12 text-green-500" />
                 </div>
-                <h1 className="text-2xl font-bold">Email Verified</h1>
-                <p className="text-muted-foreground mt-2">Your email has been verified successfully!</p>
+                <h1 className="text-2xl font-bold">Password Reset</h1>
+                <p className="text-muted-foreground mt-2">
+                  Your password has been updated successfully. You can now log in.
+                </p>
               </>
             )}
 
@@ -77,8 +124,10 @@ export default function VerifyEmailPage() {
                 <div className="flex justify-center mb-4">
                   <AlertCircle className="w-12 h-12 text-red-500" />
                 </div>
-                <h1 className="text-2xl font-bold">Verification Failed</h1>
-                <p className="text-muted-foreground mt-2">There was an error verifying your email. Please try again.</p>
+                <h1 className="text-2xl font-bold">Reset Failed</h1>
+                <p className="text-muted-foreground mt-2">
+                  Invalid or expired token. Please try again.
+                </p>
               </>
             )}
           </div>
@@ -90,7 +139,7 @@ export default function VerifyEmailPage() {
               </Button>
             )}
             {status === "error" && (
-              <Button onClick={() => router.push("/auth/signup")} className="w-full">
+              <Button onClick={() => router.push("/auth/forgot-password")} className="w-full">
                 Try Again
               </Button>
             )}
