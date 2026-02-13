@@ -1,65 +1,80 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import type React from "react";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { ThemeProvider } from "@/components/theme-provider";
+import CookieBanner from "@/components/CookieBanner";
+import { useEffect } from "react";
+import "./globals.css";
 
-const COOKIE_NAME = "cookiesAccepted";
+const geist = Geist({
+  subsets: ["latin"],
+  variable: "--font-geist-sans",
+});
 
-export default function CookieBanner() {
-  const [showBanner, setShowBanner] = useState(false);
+const geistMono = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-geist-mono",
+});
 
+// ✅ Metadata (icons removed, will handle dynamic favicon)
+export const metadata: Metadata = {
+  title: {
+    default: "Sangam Kunwar – Full Stack Developer",
+    template: "%s | Sangam Kunwar",
+  },
+  description: "Professional portfolio of Sangam Kunwar – Full Stack Developer",
+  generator: "sangamkunwar",
+};
+
+// ✅ Component to handle dynamic favicon based on theme
+const DynamicFavicon: React.FC = () => {
   useEffect(() => {
-    // Check if user already made a choice
-    const cookie = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith(COOKIE_NAME + "="));
-    if (!cookie) setShowBanner(true); // show banner only if no cookie
+    const lightIcon = "/images/light-icon.png"; // put in public/images/
+    const darkIcon = "/images/dark-icon.png";
+
+    const updateFavicon = (isDark: boolean) => {
+      let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']");
+      if (link) {
+        link.href = isDark ? darkIcon : lightIcon;
+      } else {
+        link = document.createElement("link");
+        link.rel = "icon";
+        link.href = isDark ? darkIcon : lightIcon;
+        document.head.appendChild(link);
+      }
+    };
+
+    const darkModeMedia = window.matchMedia("(prefers-color-scheme: dark)");
+    updateFavicon(darkModeMedia.matches);
+
+    darkModeMedia.addEventListener("change", (e) => updateFavicon(e.matches));
+    return () => darkModeMedia.removeEventListener("change", (e) => updateFavicon(e.matches));
   }, []);
 
-  const acceptCookies = async () => {
-    document.cookie = `${COOKIE_NAME}=true; path=/; max-age=${60 * 60 * 24 * 30}`; // 30 days
-    setShowBanner(false);
+  return null;
+};
 
-    // Optional: trigger analytics if available
-    try {
-      const analytics = await import("@vercel/analytics");
-      if (typeof analytics.inject === "function") analytics.inject();
-      if (typeof analytics.event === "function") {
-        analytics.event("cookie_accepted", {
-          category: "engagement",
-          label: "User accepted cookies",
-        });
-      }
-    } catch (error) {
-      console.warn("Analytics not available:", error);
-    }
-  };
-
-  const rejectCookies = () => {
-    document.cookie = `${COOKIE_NAME}=false; path=/; max-age=${60 * 60 * 24 * 30}`;
-    setShowBanner(false);
-  };
-
-  if (!showBanner) return null;
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="fixed bottom-4 left-4 right-4 md:bottom-6 md:left-6 md:right-6 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg shadow-lg p-4 md:p-6 flex flex-col md:flex-row justify-between items-center gap-3 z-50 animate-fadeIn">
-      <span className="text-sm md:text-base">
-        We use cookies to improve your experience on our website. You can accept or reject them.
-      </span>
-      <div className="flex gap-2 mt-2 md:mt-0">
-        <button
-          onClick={acceptCookies}
-          className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-md shadow transition duration-300"
-        >
-          Accept
-        </button>
-        <button
-          onClick={rejectCookies}
-          className="bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium px-4 py-2 rounded-md shadow transition duration-300"
-        >
-          Reject
-        </button>
-      </div>
-    </div>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {/* ✅ Dynamic favicon */}
+          <DynamicFavicon />
+
+          {/* ✅ Page content */}
+          {children}
+
+          {/* ✅ Cookie Banner */}
+          <CookieBanner />
+        </ThemeProvider>
+
+        {/* ✅ Analytics */}
+        <Analytics />
+      </body>
+    </html>
   );
 }

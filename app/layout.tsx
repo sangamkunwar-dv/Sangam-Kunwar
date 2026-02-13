@@ -19,7 +19,7 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
 });
 
-// ✅ Metadata (icons removed, will handle dynamic favicon)
+// ✅ Metadata (no static icons)
 export const metadata: Metadata = {
   title: {
     default: "Sangam Kunwar – Full Stack Developer",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   generator: "sangamkunwar",
 };
 
-// ✅ Component to handle dynamic favicon based on theme
+// ✅ Dynamic favicon component
 const DynamicFavicon: React.FC = () => {
   useEffect(() => {
     const lightIcon = "/images/light-icon.png"; // put in public/images/
@@ -50,8 +50,10 @@ const DynamicFavicon: React.FC = () => {
     const darkModeMedia = window.matchMedia("(prefers-color-scheme: dark)");
     updateFavicon(darkModeMedia.matches);
 
-    darkModeMedia.addEventListener("change", (e) => updateFavicon(e.matches));
-    return () => darkModeMedia.removeEventListener("change", (e) => updateFavicon(e.matches));
+    const listener = (e: MediaQueryListEvent) => updateFavicon(e.matches);
+    darkModeMedia.addEventListener("change", listener);
+
+    return () => darkModeMedia.removeEventListener("change", listener);
   }, []);
 
   return null;
@@ -62,17 +64,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {/* ✅ Dynamic favicon */}
+          {/* Dynamic favicon */}
           <DynamicFavicon />
 
-          {/* ✅ Page content */}
+          {/* Page content */}
           {children}
 
-          {/* ✅ Cookie Banner */}
+          {/* Cookie Banner */}
           <CookieBanner />
         </ThemeProvider>
 
-        {/* ✅ Analytics */}
+        {/* Analytics */}
         <Analytics />
       </body>
     </html>
