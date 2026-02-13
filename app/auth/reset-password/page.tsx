@@ -16,48 +16,43 @@ export default function ResetPasswordPage() {
 
   const [status, setStatus] = useState<"loading" | "form" | "success" | "error">("loading")
   const [password, setPassword] = useState("")
-  const [token, setToken] = useState("")
+  const [accessToken, setAccessToken] = useState("")
 
-  // Get token from URL
+  // 1️⃣ Get token from URL
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    const accessToken = params.get("access_token") || params.get("token")
+    const token = params.get("access_token")
     const type = params.get("type")
 
-    if (accessToken && type === "recovery") {
-      setToken(accessToken)
-      setStatus("form")
+    if (token && type === "recovery") {
+      setAccessToken(token)
+      setStatus("form") // show password form
     } else {
-      setStatus("error")
+      setStatus("error") // invalid link
     }
   }, [])
 
-  // Handle password reset
+  // 2️⃣ Handle reset password
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!accessToken) return setStatus("error")
+
     setStatus("loading")
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        password,
-      }, {
-        // Pass the token received in URL
-        accessToken: token,
-      })
+      // Use the access token to update password
+      const { error } = await supabase.auth.updateUser(
+        { password },
+        { accessToken } // pass token here
+      )
 
       if (error) {
         console.error("Reset error:", error)
+        toast({ title: "Reset Failed", description: error.message })
         setStatus("error")
-        toast({
-          title: "Reset Failed",
-          description: error.message,
-        })
       } else {
+        toast({ title: "Password Reset", description: "Your password has been updated successfully!" })
         setStatus("success")
-        toast({
-          title: "Password Reset",
-          description: "Your password has been updated successfully!",
-        })
       }
     } catch (err) {
       console.error(err)
@@ -113,9 +108,7 @@ export default function ResetPasswordPage() {
                   <CheckCircle className="w-12 h-12 text-green-500" />
                 </div>
                 <h1 className="text-2xl font-bold">Password Reset</h1>
-                <p className="text-muted-foreground mt-2">
-                  Your password has been updated successfully. You can now log in.
-                </p>
+                <p className="text-muted-foreground mt-2">Your password has been updated successfully!</p>
               </>
             )}
 
@@ -126,7 +119,7 @@ export default function ResetPasswordPage() {
                 </div>
                 <h1 className="text-2xl font-bold">Reset Failed</h1>
                 <p className="text-muted-foreground mt-2">
-                  Invalid or expired token. Please try again.
+                  Invalid or expired token. Please try resetting your password again.
                 </p>
               </>
             )}
