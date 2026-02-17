@@ -4,7 +4,6 @@ import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
 import BackgroundMusic from "@/components/BackgroundMusic"
 import CookieBanner from "@/components/CookieBanner"
-import ThemeImage from "@/components/ThemeImage"
 import "./globals.css"
 
 const geist = Geist({
@@ -42,17 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {/* 🎵 Background Music */}
           <BackgroundMusic />
 
-          {/* 🌈 Logo that switches with Dark/Light mode */}
-          <div style={{ textAlign: "center", marginTop: "20px" }}>
-            <ThemeImage
-              lightSrc="/sangamkunwarphoto.png"
-              darkSrc="/sangamkunwarphoto.png"
-              alt="Sangam Kunwar Logo"
-              width={200}
-              height={200}
-            />
-          </div>
-
+          {/* Main website content */}
           {children}
 
           {/* 🍪 Cookie Banner */}
