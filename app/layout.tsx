@@ -21,14 +21,7 @@ export const metadata: Metadata = {
     default: "Sangam Kunwar – Full Stack Developer",
     template: "%s | Sangam Kunwar",
   },
-  description:
-    "Professional portfolio of Sangam Kunwar – Full Stack Developer",
-  generator: "sangamkunwar",
-  icons: {
-    icon: "/sangamkunwarphoto.png", // better to use local file
-    shortcut: "/sangamkunwarphoto.png",
-    apple: "/sangamkunwarphoto.png",
-  },
+  description: "Professional portfolio website",
 }
 
 export default function RootLayout({
@@ -42,17 +35,16 @@ export default function RootLayout({
         className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          
-          {/* ✅ Background Music */}
+
+          {/* 🎵 Background Music */}
           <BackgroundMusic />
 
           {children}
 
-          {/* ✅ Cookie Banner */}
+          {/* 🍪 Cookie Banner */}
           <CookieBanner />
         </ThemeProvider>
 
-        {/* ✅ Analytics */}
         <Analytics />
       </body>
     </html>
