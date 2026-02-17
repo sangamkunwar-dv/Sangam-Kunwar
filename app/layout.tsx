@@ -1,13 +1,10 @@
-import type React from "react"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
-import "./globals.css"
 import BackgroundMusic from "@/components/BackgroundMusic"
-
-// ✅ Import CookieBanner
 import CookieBanner from "@/components/CookieBanner"
+import "./globals.css"
 
 const geist = Geist({
   subsets: ["latin"],
@@ -24,29 +21,14 @@ export const metadata: Metadata = {
     default: "Sangam Kunwar – Full Stack Developer",
     template: "%s | Sangam Kunwar",
   },
-  description: "Professional portfolio of Sangam Kunwar – Full Stack Developer",
+  description:
+    "Professional portfolio of Sangam Kunwar – Full Stack Developer",
   generator: "sangamkunwar",
-
   icons: {
-    icon: "https://sangamkunwars.netlify.app/sangamkunwarphoto.png",
-    shortcut: "https://sangamkunwars.netlify.app/sangamkunwarphoto.png",
-    apple: "https://sangamkunwars.netlify.app/sangamkunwarphoto.png",
+    icon: "/sangamkunwarphoto.png", // better to use local file
+    shortcut: "/sangamkunwarphoto.png",
+    apple: "/sangamkunwarphoto.png",
   },
-}
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return (
-    <html lang="en">
-      <body>
-        <BackgroundMusic />
-        {children}
-      </body>
-    </html>
-  )
 }
 
 export default function RootLayout({
@@ -60,11 +42,17 @@ export default function RootLayout({
         className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          
+          {/* ✅ Background Music */}
+          <BackgroundMusic />
+
           {children}
 
-          {/* ✅ Add CookieBanner here */}
+          {/* ✅ Cookie Banner */}
           <CookieBanner />
         </ThemeProvider>
+
+        {/* ✅ Analytics */}
         <Analytics />
       </body>
     </html>
