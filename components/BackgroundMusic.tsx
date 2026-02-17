@@ -6,42 +6,33 @@ export default function BackgroundMusic() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [isPlaying, setIsPlaying] = useState(false)
 
-  // Load saved music state on first render
   useEffect(() => {
-    const savedState = localStorage.getItem("music-enabled")
-
-    if (savedState === "true") {
-      playMusic()
-    }
+    const saved = localStorage.getItem("music-enabled")
+    if (saved === "true") playMusic()
   }, [])
 
   const playMusic = async () => {
     if (!audioRef.current) return
-
     try {
       audioRef.current.volume = 0.3
       await audioRef.current.play()
       setIsPlaying(true)
       localStorage.setItem("music-enabled", "true")
-    } catch (error) {
-      console.log("Autoplay blocked. User must click first.")
+    } catch (err) {
+      console.log("Autoplay blocked until user interaction")
     }
   }
 
   const stopMusic = () => {
     if (!audioRef.current) return
-
     audioRef.current.pause()
     setIsPlaying(false)
     localStorage.setItem("music-enabled", "false")
   }
 
   const toggleMusic = () => {
-    if (isPlaying) {
-      stopMusic()
-    } else {
-      playMusic()
-    }
+    if (isPlaying) stopMusic()
+    else playMusic()
   }
 
   return (
