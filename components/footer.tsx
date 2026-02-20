@@ -37,7 +37,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2 text-muted-foreground">
                 <Phone size={16} />
-                <a href="tel:+9701024066" className="hover:text-foreground transition-colors">
+                <a href="https://wa.me/9779701024066?text=Hello%20Sangam%20Kunwar,%20I%20am%20interested%20and%20would%20like%20to%20know%20more%20about%20your%20services.%20Please%20share%20complete%20details%20along%20with%20pricing%20and%20further%20information." className="hover:text-foreground transition-colors">
                   +977 9701024066
                 </a>
               </li>
