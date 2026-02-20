@@ -86,11 +86,11 @@ export default function Header() {
               </Link>
             ))}
             <Link
-              href="/admin"
+              href="/auth/login"
               className="block px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
               onClick={() => setIsOpen(false)}
             >
-              Admin
+              Login
             </Link>
           </div>
         )}
