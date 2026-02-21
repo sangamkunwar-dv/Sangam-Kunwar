@@ -1,19 +1,23 @@
 "use client"
 
-import { createBrowserClient } from "@supabase/ssr"
+// ✅ Import from supabase-js for browser/client operations
+import { createClient as createBrowserClient } from "@supabase/supabase-js"
 
 export function createClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://brczzheawdhzybtzrqeg.supabase.co"
-  const key =
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJyY3p6aGVhd2RoenlidHpycWVnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MzQ4OTUsImV4cCI6MjA4NjUxMDg5NX0.4_sX3Ll9zY-YcxNCgxOuv8ZX4UPnuur8KSUtgoOWFsc"
+  // ✅ Read URL and ANON KEY from environment variables
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
+  // ⚠️ Check if env variables are missing
   if (!url || !key) {
-    console.error("[v0] ⚠️  CRITICAL: Supabase URL or Key is missing")
-    console.error("[v0] Please check environment variables: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY")
+    console.error("[Supabase Client] ⚠️ CRITICAL: URL or ANON_KEY missing!")
+    console.error(
+      "Make sure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set in .env.local"
+    )
   } else {
-    console.log("[v0] ✅ Supabase client initialized")
+    console.log("[Supabase Client] ✅ Initialized successfully")
   }
 
-  return createBrowserClient(url, key)
+  // ✅ Create and return the Supabase client
+  return createBrowserClient(url!, key!)
 }

@@ -10,7 +10,6 @@ import { Card } from "@/components/ui/card"
 export default function ForgotPasswordPage() {
   const supabase = createClient()
   const { toast } = useToast()
-
   const [email, setEmail] = useState("")
   const [loading, setLoading] = useState(false)
 
@@ -18,17 +17,8 @@ export default function ForgotPasswordPage() {
     e.preventDefault()
     setLoading(true)
 
-    if (!email) {
-      toast({
-        title: "Email Required",
-        description: "Please enter your email address.",
-      })
-      setLoading(false)
-      return
-    }
-
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${window.location.origin}/auth/reset-password`,
     })
 
     if (error) {
@@ -40,7 +30,7 @@ export default function ForgotPasswordPage() {
     } else {
       toast({
         title: "Check Your Email 📩",
-        description: "Password reset link has been sent.",
+        description: "Password reset link has been sent to your email.",
       })
       setEmail("")
     }

@@ -1,45 +1,24 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { useToast } from "@/hooks/use-toast"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
-import { useToast } from "@/hooks/use-toast"
 
-export default function ResetPasswordPage() {
+export default function ForgotPasswordPage() {
   const supabase = createClient()
-  const router = useRouter()
   const { toast } = useToast()
+  const [email, setEmail] = useState("")
+  const [loading, setLoading] = useState(false)
 
-  const [password, setPassword] = useState("")
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    const handleRecovery = async () => {
-      // Supabase automatically reads token from URL hash
-      const { data, error } = await supabase.auth.getSession()
-
-      if (error || !data.session) {
-        toast({
-          title: "Invalid or Expired Link",
-          description: "Please request a new password reset link.",
-        })
-        router.replace("/auth/forgot-password")
-      } else {
-        setLoading(false)
-      }
-    }
-
-    handleRecovery()
-  }, [router, supabase, toast])
-
-  const handleReset = async (e: React.FormEvent) => {
+  const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoading(true)
 
-    const { error } = await supabase.auth.updateUser({
-      password,
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`,
     })
 
     if (error) {
@@ -50,41 +29,39 @@ export default function ResetPasswordPage() {
       })
     } else {
       toast({
-        title: "Password Updated ✅",
-        description: "You can now login with your new password.",
+        title: "Check Your Email 📩",
+        description: "Password reset link has been sent to your email.",
       })
-      router.replace("/auth/login")
+      setEmail("")
     }
-  }
 
-  if (loading) {
-    return <p className="text-center mt-10">Verifying reset link...</p>
+    setLoading(false)
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <Card className="w-full max-w-md p-8 space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold">Reset Password</h1>
+          <h1 className="text-3xl font-bold">Forgot Password</h1>
           <p className="text-muted-foreground mt-2">
-            Enter your new password below
+            Enter your email to receive a reset link.
           </p>
         </div>
 
-        <form onSubmit={handleReset} className="space-y-4">
+        <form onSubmit={handleForgotPassword} className="space-y-4">
           <div>
-            <label className="text-sm font-medium">New Password</label>
+            <label className="text-sm font-medium">Email</label>
             <Input
-              type="password"
-              placeholder="Enter new password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type="email"
+              placeholder="your@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </div>
 
-          <Button type="submit" className="w-full">
-            Update Password
+          <Button type="submit" className="w-full" disabled={loading}>
+            {loading ? "Sending..." : "Send Reset Link"}
           </Button>
         </form>
       </Card>
