@@ -16,7 +16,7 @@ export default function ForgotPasswordPage() {
     setLoading(true)
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "http://localhost:3000/reset-password",
+      redirectTo: "http://sangamkunwars.netlify.app/reset-password",
     })
 
     if (error) {
