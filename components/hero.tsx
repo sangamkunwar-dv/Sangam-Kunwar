@@ -117,7 +117,7 @@ export default function Hero() {
             <div className="grid grid-cols-3 gap-8 pt-8 border-t border-border">
               <div>
                 <p className="text-2xl sm:text-3xl font-bold text-primary">
-                  50+
+                  20+
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Projects Completed
@@ -126,7 +126,7 @@ export default function Hero() {
 
               <div>
                 <p className="text-2xl sm:text-3xl font-bold text-primary">
-                  5+
+                  3+
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Years Experience
@@ -135,7 +135,7 @@ export default function Hero() {
 
               <div>
                 <p className="text-2xl sm:text-3xl font-bold text-primary">
-                  30+
+                  15+
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Happy Clients

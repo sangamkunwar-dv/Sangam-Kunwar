@@ -21,13 +21,32 @@ export default function SignupPage() {
   const { toast } = useToast()
   const supabase = createClient()
 
+  // 🔥 Social Login Function
+  const handleOAuthLogin = async (provider: "google" | "github") => {
+    setLoading(true)
+
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    })
+
+    if (error) {
+      toast({
+        title: "Login Failed",
+        description: error.message,
+        variant: "destructive",
+      })
+      setLoading(false)
+    }
+  }
+
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
     try {
-      console.log("[Sangam Kunwar] Attempting signup for:", email)
-
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -40,7 +59,6 @@ export default function SignupPage() {
       })
 
       if (error) {
-        console.error("[Sangam Kunwar] Signup error:", error)
         toast({
           title: "Signup Failed",
           description: error.message,
@@ -50,12 +68,10 @@ export default function SignupPage() {
       }
 
       if (data.user) {
-        console.log("[Sangam Kunwar] Signup successful – email verification required")
-
         toast({
           title: "Account Created!",
           description:
-            "Please check your email and click the verification link to activate your account.",
+            "Please check your email and verify your account.",
         })
 
         setTimeout(() => {
@@ -63,10 +79,9 @@ export default function SignupPage() {
         }, 1500)
       }
     } catch (err) {
-      console.error("[Sangam Kunwar] Unexpected signup error:", err)
       toast({
         title: "Error",
-        description: "An unexpected error occurred during signup",
+        description: "Unexpected error occurred",
         variant: "destructive",
       })
     } finally {
@@ -91,6 +106,40 @@ export default function SignupPage() {
             <p className="text-muted-foreground mt-2">
               Join to send me messages
             </p>
+          </div>
+
+          {/* 🔥 GOOGLE LOGIN */}
+          <Button
+            variant="outline"
+            className="w-full flex items-center gap-2"
+            onClick={() => handleOAuthLogin("google")}
+            disabled={loading}
+          >
+            <img
+              src="https://www.svgrepo.com/show/475656/google-color.svg"
+              alt="Google"
+              className="w-5 h-5"
+            />
+            Continue with Google
+          </Button>
+
+          {/* 🔥 GITHUB LOGIN */}
+          <Button
+            variant="outline"
+            className="w-full flex items-center gap-2"
+            onClick={() => handleOAuthLogin("github")}
+            disabled={loading}
+          >
+            <img
+              src="https://www.svgrepo.com/show/512317/github-142.svg"
+              alt="GitHub"
+              className="w-5 h-5"
+            />
+            Continue with GitHub
+          </Button>
+
+          <div className="text-center text-sm text-muted-foreground">
+            OR
           </div>
 
           <form onSubmit={handleSignup} className="space-y-4">

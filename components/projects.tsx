@@ -22,8 +22,8 @@ const defaultProjects: Project[] = [
     description: "Full-stack e-commerce solution with payment integration",
     tech_stack: ["Node.js", "MongoDB", "React"],
     image_url: "/ecommerce-dashboard.png?height=192&width=384&query=ecommerce",
-    github_link: "https://github.com",
-    live_link: "https://example.com",
+    github_link: "https://github.com/sangamkunwar-dv",
+    live_link: "https://sangamkunwars.netlify.app",
   },
   {
     id: "2",
@@ -31,8 +31,8 @@ const defaultProjects: Project[] = [
     description: "Data visualization dashboard with interactive charts",
     tech_stack: ["Next.js", "Recharts", "Supabase"],
     image_url: "/analytics-dashboard-charts.png?height=192&width=384&query=analytics",
-    github_link: "https://github.com",
-    live_link: "https://example.com",
+    github_link: "https://github.com/sangamkunwar-dv",
+    live_link: "https://sangamkunwars.netlify.app",
   },
 ]
 
@@ -43,14 +43,14 @@ export default function Projects() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        console.log("[v0] Fetching projects...")
+        console.log("[sangamkunwar] Fetching projects...")
         const response = await fetch("/api/projects")
         if (!response.ok) throw new Error("Failed to fetch projects")
         const data = await response.json()
-        console.log("[v0] Projects loaded:", data)
+        console.log("[sangamkunwar] Projects loaded:", data)
         setProjects(data && data.length > 0 ? data : defaultProjects)
       } catch (error) {
-        console.error("[v0] Error fetching projects:", error)
+        console.error("[sangamkunwar] Error fetching projects:", error)
         setProjects(defaultProjects)
       } finally {
         setLoading(false)
