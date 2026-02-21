@@ -12,83 +12,66 @@ export default function ResetPasswordPage() {
   const { toast } = useToast()
 
   const [password, setPassword] = useState("")
-  const [status, setStatus] = useState<"loading" | "form" | "success" | "error">("loading")
-  const [token, setToken] = useState("")
+  const [loading, setLoading] = useState(true)
 
-  // Get token from URL
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const access_token = params.get("access_token")
-    const type = params.get("type")
+    const checkSession = async () => {
+      const { data } = await supabase.auth.getSession()
 
-    if (access_token && type === "recovery") {
-      setToken(access_token)
-      setStatus("form")
-    } else {
-      setStatus("error")
+      if (!data.session) {
+        toast({
+          title: "Invalid Link",
+          description: "Reset link expired or invalid.",
+        })
+        router.push("/auth/forgot-password")
+      }
+
+      setLoading(false)
     }
-  }, [])
+
+    checkSession()
+  }, [router, supabase, toast])
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!token) return setStatus("error")
 
-    setStatus("loading")
-
-    const { error } = await supabase.auth.updateUser(
-      { password },
-      { accessToken: token }
-    )
+    const { error } = await supabase.auth.updateUser({
+      password,
+    })
 
     if (error) {
-      console.error(error)
-      toast({ title: "Reset Failed", description: error.message })
-      setStatus("error")
+      toast({
+        title: "Reset Failed",
+        description: error.message,
+      })
     } else {
-      toast({ title: "Password Updated", description: "You can now login with your new password" })
-      setStatus("success")
+      toast({
+        title: "Password Updated",
+        description: "You can now login.",
+      })
+
+      router.push("/auth/login")
     }
   }
 
+  if (loading) return <p className="text-center mt-10">Loading...</p>
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md p-8 border rounded space-y-4">
-        {status === "loading" && <p>Loading...</p>}
-
-        {status === "form" && (
-          <form onSubmit={handleReset} className="space-y-4">
-            <h2 className="text-2xl font-bold">Reset Password</h2>
-            <input
-              type="password"
-              placeholder="Enter new password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="w-full p-2 border rounded"
-            />
-            <Button type="submit" className="w-full">Update Password</Button>
-          </form>
-        )}
-
-        {status === "success" && (
-          <>
-            <h2 className="text-2xl font-bold text-green-600">Password Updated!</h2>
-            <Button onClick={() => router.push("/auth/login")} className="w-full">
-              Go to Login
-            </Button>
-          </>
-        )}
-
-        {status === "error" && (
-          <>
-            <h2 className="text-2xl font-bold text-red-600">Reset Failed</h2>
-            <p>Invalid or expired link. Try again.</p>
-            <Button onClick={() => router.push("/auth/forgot-password")} className="w-full">
-              Try Again
-            </Button>
-          </>
-        )}
-      </div>
+      <form onSubmit={handleReset} className="w-full max-w-md p-8 border rounded space-y-4">
+        <h2 className="text-2xl font-bold">Reset Password</h2>
+        <input
+          type="password"
+          placeholder="Enter new password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="w-full p-2 border rounded"
+        />
+        <Button type="submit" className="w-full">
+          Update Password
+        </Button>
+      </form>
     </div>
   )
 }

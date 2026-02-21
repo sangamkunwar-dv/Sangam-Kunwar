@@ -16,13 +16,16 @@ export default function ForgotPasswordPage() {
     setLoading(true)
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "http://sangamkunwars.netlify.app/reset-password",
+      redirectTo: `${window.location.origin}/reset-password`,
     })
 
     if (error) {
       toast({ title: "Error", description: error.message })
     } else {
-      toast({ title: "Success", description: "Check your email for reset link" })
+      toast({
+        title: "Check Email",
+        description: "Password reset link sent.",
+      })
     }
 
     setLoading(false)
