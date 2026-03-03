@@ -19,19 +19,38 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <nav className="mx-auto max-w-6xl px-4 py-3 sm:px-6 lg:px-8">
+      <nav className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-primary">
+
+          {/* LOGO SECTION */}
+          <Link
+            href="/"
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+          >
+            <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-primary">
+
+              {/* Light Mode Logo */}
               <Image
-                src="https://sangamkunwars.netlify.app/sangamkunwarphoto.png"
-                alt="Sangam Kunwar"
-                width={40}
-                height={40}
-                className="w-full h-full object-cover"
+                src="/sangam_kunwar.png"   
+                alt="Sangam Logo"
+                fill
+                className="object-cover block dark:hidden"
+                priority
+              />
+
+              {/* Dark Mode Logo */}
+              <Image
+                src="/sangamkunwarphoto.png"  
+                alt="Sangam Logo White"
+                fill
+                className="object-cover hidden dark:block"
+                priority
               />
             </div>
-            <span className="hidden sm:inline font-bold text-lg">Sangam Kunwar</span>
+
+            <span className="hidden sm:inline font-bold text-lg">
+              Sangam Kunwar
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -48,7 +67,9 @@ export default function Header() {
           </div>
 
           {/* Right Actions */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+
+            {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
               className="p-2 hover:bg-muted rounded-lg transition-colors"
@@ -56,13 +77,16 @@ export default function Header() {
             >
               {isDark ? <Sun size={20} /> : <Moon size={20} />}
             </button>
+
+            {/* Login Button (Desktop) */}
             <Link
               href="/auth/login"
               className="hidden sm:inline-block px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
             >
               Login
             </Link>
-            
+
+            {/* Mobile Menu Button */}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="md:hidden p-2 hover:bg-muted rounded-lg transition-colors"
@@ -74,7 +98,7 @@ export default function Header() {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden mt-4 space-y-2 pb-4">
+          <div className="md:hidden mt-4 space-y-2 pb-4 animate-in slide-in-from-top-2 duration-200">
             {navItems.map((item) => (
               <Link
                 key={item.label}
@@ -85,6 +109,7 @@ export default function Header() {
                 {item.label}
               </Link>
             ))}
+
             <Link
               href="/auth/login"
               className="block px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
