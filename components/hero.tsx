@@ -114,7 +114,7 @@ export default function Hero() {
 
             {/* ☀ Light Mode Image */}
             <Image
-              src={hero.photo_url || "/sangam_kunwar.pngg"}
+              src={hero.photo_url || "/sangam_kunwar.png"}
               alt="Hero Light"
               fill
               priority
