@@ -37,7 +37,7 @@ export default function Hero() {
           subtitle: "Full-Stack Developer & Designer",
           description:
             "I build modern, fast and beautiful web applications with clean UI/UX design.",
-          photo_url: "/hero-light.png", // light image
+          photo_url: "/sangam_kunwar.png", // light image
           logo_url: "",
         })
       } finally {
@@ -114,7 +114,7 @@ export default function Hero() {
 
             {/* ☀ Light Mode Image */}
             <Image
-              src={hero.photo_url || "/sangam_kunwar.png"}
+              src={hero.photo_url || ""}
               alt="Hero Light"
               fill
               priority
