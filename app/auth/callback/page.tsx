@@ -17,7 +17,7 @@ export default function AuthCallbackPage() {
       } = await supabase.auth.getSession()
 
       if (error) {
-        console.error("[sangamkunwar] Auth callback error:", error)
+        console.error("[v0] Auth callback error:", error)
         router.push("/auth/login?error=callback_failed")
         return
       }
