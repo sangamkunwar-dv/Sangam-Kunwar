@@ -1,4 +1,5 @@
-// pages/404.tsx (or app/not-found.tsx for Next.js 13 app router)
+"use client"; // <-- IMPORTANT: Mark this as a Client Component
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -72,7 +73,7 @@ export default function NotFound() {
 
       {/* Footer */}
       <p className="mt-12 text-gray-400 text-sm animate-fadeIn delay-1000">
-        © {new Date().getFullYear()} Your Name. All rights reserved.
+        © {new Date().getFullYear()} sangam kunwar. All rights reserved.
       </p>
 
       {/* Tailwind Custom Animations */}
