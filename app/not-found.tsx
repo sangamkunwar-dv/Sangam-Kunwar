@@ -1,10 +1,9 @@
-import Link from "next/link";
+import Link from "next/link"
 
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-[#0b1622] text-white flex flex-col items-center justify-center overflow-hidden">
 
-      {/* Sliding Text */}
       <div className="w-full overflow-hidden mb-10">
         <div className="flex animate-slide whitespace-nowrap text-6xl md:text-8xl font-extrabold opacity-90">
 
@@ -22,21 +21,13 @@ export default function NotFound() {
 
           <span className="mx-8 text-gray-400">Page</span>
 
-          <span className="mx-8 bg-gradient-to-r from-cyan-400 to-teal-400 text-transparent bg-clip-text">
-            404
-          </span>
-
-          <span className="mx-8 text-gray-200">Missing Page</span>
-
         </div>
       </div>
 
-      {/* Description */}
       <p className="text-gray-300 text-center max-w-xl mb-8">
         The page you are looking for doesn't exist or has been moved.
       </p>
 
-      {/* Buttons */}
       <div className="flex gap-4">
 
         <Link
@@ -55,21 +46,6 @@ export default function NotFound() {
 
       </div>
 
-      {/* Animation Style */}
-      <style jsx>{`
-        @keyframes slide {
-          0% {
-            transform: translateX(0%);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-
-        .animate-slide {
-          animation: slide 12s linear infinite;
-        }
-      `}</style>
     </div>
-  );
+  )
 }
