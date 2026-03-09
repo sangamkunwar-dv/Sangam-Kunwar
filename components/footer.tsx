@@ -10,7 +10,7 @@ export default function Footer() {
       label: "LinkedIn",
     },
     { icon: Github, href: "https://github.com/sangamkunwar-dv", label: "GitHub" },
-    { icon: Mail, href: "mailto:sangamkunwar48@gmail.com", label: "Email" },
+    { icon: Mail, href: "mailto:info@sangamkunwar.com.np", label: "Email" },
   ]
 
   return (
@@ -32,7 +32,11 @@ export default function Footer() {
               <li className="flex items-center gap-2 text-muted-foreground">
                 <Mail size={16} />
                 <a href="mailto:info@sangamkunwar.com.np" className="hover:text-foreground transition-colors">
+<<<<<<< HEAD
                   info@sangamkunwar.com.np
+=======
+                  info@sangamkunwar.
+>>>>>>> fe64d5d0c0a86fa83eb393e10c76cad488d17966
                 </a>
               </li>
               <li className="flex items-center gap-2 text-muted-foreground">
