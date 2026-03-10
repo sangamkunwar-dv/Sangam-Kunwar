@@ -32,11 +32,7 @@ export default function Footer() {
               <li className="flex items-center gap-2 text-muted-foreground">
                 <Mail size={16} />
                 <a href="mailto:info@sangamkunwar.com.np" className="hover:text-foreground transition-colors">
-<<<<<<< HEAD
-                  info@sangamkunwar.com.np
-=======
-                  info@sangamkunwar.
->>>>>>> fe64d5d0c0a86fa83eb393e10c76cad488d17966
+                   info@sangamkunwar.com.np
                 </a>
               </li>
               <li className="flex items-center gap-2 text-muted-foreground">
