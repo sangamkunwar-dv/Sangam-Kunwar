@@ -17,9 +17,9 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
 })
 
-// Metadata (SEO + Image for Google)
+// Metadata (Fixed for Google Search)
 export const metadata: Metadata = {
-  metadataBase: new URL("https://yourdomain.com"), // CHANGE to your real domain
+  metadataBase: new URL("https://sangamkunwar.com.np"),
 
   title: {
     default: "Sangam Kunwar – Full Stack Developer",
@@ -31,10 +31,11 @@ export const metadata: Metadata = {
 
   generator: "sangamkunwar",
 
+  // FIXED: Pointing to the 1:1 square icon for search results
   icons: {
-    icon: "/sangamkunwarphoto.png",
-    shortcut: "/sangamkunwarphoto.png",
-    apple: "/sangamkunwarphoto.png",
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
   },
 
   openGraph: {
@@ -45,7 +46,7 @@ export const metadata: Metadata = {
     siteName: "Sangam Kunwar",
     images: [
       {
-        url: "/sangamkunwarphoto.png",
+        url: "/sangamkunwarphoto.png", // Keeps the professional banner for social media
         width: 1200,
         height: 630,
         alt: "Sangam Kunwar Photo",
@@ -69,28 +70,22 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      {/* CLEANED UP <head>: 
+          Next.js automatically injects icons, manifest, and title from the metadata object above.
+          Only keep things that the Metadata API doesn't handle natively.
+      */}
       <head>
-        <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#7b3fe4" />
-        <link rel="apple-touch-icon" href="/sangamkunwarphoto.png" />
       </head>
 
       <body
         className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}
       >
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-
-          {/* Background Music */}
           <BackgroundMusic />
-
-          {/* Main Content */}
           {children}
-
-          {/* Cookie Banner */}
           <CookieBanner />
         </ThemeProvider>
-
-        {/* Analytics */}
         <Analytics />
       </body>
     </html>
