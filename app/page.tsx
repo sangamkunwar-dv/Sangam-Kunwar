@@ -4,6 +4,7 @@ import Projects from "@/components/projects"
 import Skills from "@/components/skills"
 import ContactForm from "@/components/contact-form"
 import Footer from "@/components/footer"
+import InstallButton from "@/components/InstallButton"
 
 export default function Home() {
   return (
@@ -14,6 +15,9 @@ export default function Home() {
       <Skills />
       <ContactForm />
       <Footer />
+
+      {/* Install PWA Button */}
+      <InstallButton />
     </main>
   )
 }

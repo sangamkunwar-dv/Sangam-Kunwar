@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
 })
 
-// Metadata (Fixed for Google Search)
+// Metadata
 export const metadata: Metadata = {
   metadataBase: new URL("https://sangamkunwar.com.np"),
 
@@ -31,12 +31,13 @@ export const metadata: Metadata = {
 
   generator: "sangamkunwar",
 
-  // FIXED: Pointing to the 1:1 square icon for search results
   icons: {
     icon: "/icon.png",
     shortcut: "/icon.png",
     apple: "/icon.png",
   },
+
+  manifest: "/manifest.json",
 
   openGraph: {
     title: "Sangam Kunwar – Full Stack Developer",
@@ -46,7 +47,7 @@ export const metadata: Metadata = {
     siteName: "Sangam Kunwar",
     images: [
       {
-        url: "/sangamkunwarphoto.png", // Keeps the professional banner for social media
+        url: "/sangamkunwarphoto.png",
         width: 1200,
         height: 630,
         alt: "Sangam Kunwar Photo",
@@ -63,29 +64,42 @@ export const metadata: Metadata = {
       "Official portfolio of Sangam Kunwar – Full Stack Developer and tech creator.",
     images: ["/sangamkunwarphoto.png"],
   },
-
-  manifest: "/manifest.json",
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
-      {/* CLEANED UP <head>: 
-          Next.js automatically injects icons, manifest, and title from the metadata object above.
-          Only keep things that the Metadata API doesn't handle natively.
-      */}
       <head>
         <meta name="theme-color" content="#7b3fe4" />
+
+        {/* Register Service Worker */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js');
+                });
+              }
+            `,
+          }}
+        />
       </head>
 
-      <body
-        className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}
-      >
+      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <BackgroundMusic />
+
           {children}
+
           <CookieBanner />
+
         </ThemeProvider>
+
         <Analytics />
       </body>
     </html>

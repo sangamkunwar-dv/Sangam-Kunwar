@@ -1,11 +1,10 @@
 {
-  "name": "Sangam Kunwar Portfolio",
-  "short_name": "Portfolio",
-  "description": "Professional portfolio of Sangam Kunwar",
+  "name": "Sangam Kunwar",
+  "short_name": "Sangam Kunwar",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#7b3fe4",
+  "background_color": "#000000",
+  "theme_color": "#6a0dad",
   "icons": [
     {
       "src": "/sangamkunwarphoto.png",
