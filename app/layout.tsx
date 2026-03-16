@@ -1,20 +1,15 @@
 import type { Metadata } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Inter } from "next/font/google"
 import { Analytics } from "@vercel/analytics/next"
 import { ThemeProvider } from "@/components/theme-provider"
 import BackgroundMusic from "@/components/BackgroundMusic"
 import CookieBanner from "@/components/CookieBanner"
 import "./globals.css"
 
-// Fonts
-const geist = Geist({
+// Fonts (replace Geist with Inter)
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-geist-sans",
-})
-
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
-  variable: "--font-geist-mono",
+  variable: "--font-inter",
 })
 
 // Metadata
@@ -90,14 +85,13 @@ export default function RootLayout({
         />
       </head>
 
-      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <BackgroundMusic />
 
           {children}
 
           <CookieBanner />
-
         </ThemeProvider>
 
         <Analytics />
