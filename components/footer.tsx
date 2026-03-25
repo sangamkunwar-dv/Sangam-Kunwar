@@ -105,7 +105,7 @@ export default function Footer() {
         <div className="border-t border-border pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <p>
             © {currentYear} <span className="font-medium text-foreground">Sangam Kunwar</span>. All rights reserved.
-          </p>.
+          </p>
         </div>
       </div>
     </footer>
