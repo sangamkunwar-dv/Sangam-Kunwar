@@ -19,7 +19,6 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
-
 // POST
 export async function POST(request) {
   try {
