@@ -1,57 +1,42 @@
-import { createServerClient } from "@supabase/ssr"
-import { cookies } from "next/headers"
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server"
 
+// GET
 export async function GET() {
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
-        },
-      },
-    },
-  )
+  try {
+    const supabase = createClient()
 
-  const { data, error } = await supabase.from("skills").select("*").order("updated_at", { ascending: false })
+    const { data, error } = await supabase
+      .from("skills")
+      .select("*")
+      .order("level", { ascending: false })
 
-  if (error) {
+    if (error) throw error
+
+    return NextResponse.json(data || [])
+  } catch (error) {
+    console.error("Skills GET:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
-
-  return NextResponse.json(data || [])
 }
 
-export async function POST(request: NextRequest) {
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
-        },
-      },
-    },
-  )
+// POST
+export async function POST(request) {
+  try {
+    const supabase = createClient()
+    const body = await request.json()
 
-  const body = await request.json()
+    const { data, error } = await supabase
+      .from("skills")
+      .insert([body])
+      .select()
+      .single()
 
-  const { data, error } = await supabase.from("skills").insert([body]).select()
+    if (error) throw error
 
-  if (error) {
+    return NextResponse.json(data, { status: 201 })
+  } catch (error) {
+    console.error("Skills POST:", error)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
-
-  return NextResponse.json(data[0], { status: 201 })
 }

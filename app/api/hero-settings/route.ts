@@ -1,74 +1,65 @@
-import { createServerClient } from "@supabase/ssr"
-import { cookies } from "next/headers"
-import { type NextRequest, NextResponse } from "next/server"
+import { NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server"
 
+// GET
 export async function GET() {
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
-        },
-      },
-    },
-  )
+  try {
+    const supabase = createClient()
 
-  const { data, error } = await supabase.from("hero_settings").select("*").limit(1).single()
-
-  if (error && error.code !== "PGRST116") {
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
-
-  return NextResponse.json(data || {})
-}
-
-export async function PUT(request: NextRequest) {
-  const cookieStore = await cookies()
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll()
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
-        },
-      },
-    },
-  )
-
-  const body = await request.json()
-
-  // Get existing record to update
-  const { data: existing } = await supabase.from("hero_settings").select("id").limit(1).single()
-
-  if (existing) {
     const { data, error } = await supabase
       .from("hero_settings")
-      .update({ ...body, updated_at: new Date().toISOString() })
-      .eq("id", existing.id)
-      .select()
+      .select("*")
+      .limit(1)
+      .maybeSingle()
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    if (error) throw error
+
+    return NextResponse.json(data || {})
+  } catch (error) {
+    console.error("Hero GET:", error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
+}
+
+// PUT
+export async function PUT(request) {
+  try {
+    const supabase = createClient()
+    const body = await request.json()
+
+    const { data: existing, error: fetchError } = await supabase
+      .from("hero_settings")
+      .select("id")
+      .limit(1)
+      .maybeSingle()
+
+    if (fetchError) throw fetchError
+
+    if (existing) {
+      const { data, error } = await supabase
+        .from("hero_settings")
+        .update({
+          ...body,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", existing.id)
+        .select()
+        .single()
+
+      if (error) throw error
+      return NextResponse.json(data)
+    } else {
+      const { data, error } = await supabase
+        .from("hero_settings")
+        .insert([body])
+        .select()
+        .single()
+
+      if (error) throw error
+      return NextResponse.json(data)
     }
-
-    return NextResponse.json(data[0])
-  } else {
-    const { data, error } = await supabase.from("hero_settings").insert([body]).select()
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json(data[0], { status: 201 })
+  } catch (error) {
+    console.error("Hero PUT:", error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
