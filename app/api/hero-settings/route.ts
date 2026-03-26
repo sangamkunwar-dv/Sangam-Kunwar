@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 
-// GET
+// GET Hero
 export async function GET() {
   try {
     const supabase = createClient()
@@ -15,18 +15,22 @@ export async function GET() {
     if (error) throw error
 
     return NextResponse.json(data || {})
-  } catch (error) {
+  } catch (error: any) {
     console.error("Hero GET:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: error.message || String(error) }, { status: 500 })
   }
 }
 
-// PUT
-export async function PUT(request) {
+// UPDATE or INSERT Hero
+export async function PUT(request: Request) {
   try {
     const supabase = createClient()
     const body = await request.json()
 
+    // Ensure updated_at exists
+    body.updated_at = new Date().toISOString()
+
+    // Fetch existing row
     const { data: existing, error: fetchError } = await supabase
       .from("hero_settings")
       .select("id")
@@ -35,13 +39,11 @@ export async function PUT(request) {
 
     if (fetchError) throw fetchError
 
-    if (existing) {
+    if (existing?.id) {
+      // UPDATE existing row
       const { data, error } = await supabase
         .from("hero_settings")
-        .update({
-          ...body,
-          updated_at: new Date().toISOString(),
-        })
+        .update(body)
         .eq("id", existing.id)
         .select()
         .single()
@@ -49,6 +51,7 @@ export async function PUT(request) {
       if (error) throw error
       return NextResponse.json(data)
     } else {
+      // INSERT new row
       const { data, error } = await supabase
         .from("hero_settings")
         .insert([body])
@@ -58,8 +61,8 @@ export async function PUT(request) {
       if (error) throw error
       return NextResponse.json(data)
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error("Hero PUT:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: error.message || String(error) }, { status: 500 })
   }
 }
