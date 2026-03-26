@@ -1,16 +1,17 @@
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
-import { ThemeProvider } from "@/components/theme-provider"
-import BackgroundMusic from "@/components/BackgroundMusic"
-import CookieBanner from "@/components/CookieBanner"
-import "./globals.css"
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
+import { ThemeProvider } from "@/components/theme-provider";
+import BackgroundMusic from "@/components/BackgroundMusic";
+import CookieBanner from "@/components/CookieBanner";
+import "./globals.css"; // ✅ Global CSS only imported here
 
 // Fonts (replace Geist with Inter)
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
-})
+  display: "swap", // improves font loading performance
+});
 
 // Metadata
 export const metadata: Metadata = {
@@ -59,18 +60,17 @@ export const metadata: Metadata = {
       "Official portfolio of Sangam Kunwar – Full Stack Developer and tech creator.",
     images: ["/sangamkunwarphoto.png"],
   },
-}
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <head>
         <meta name="theme-color" content="#7b3fe4" />
-
         {/* Register Service Worker */}
         <script
           dangerouslySetInnerHTML={{
@@ -85,7 +85,7 @@ export default function RootLayout({
         />
       </head>
 
-      <body className={`${inter.variable} font-sans antialiased`}>
+      <body className="font-sans antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <BackgroundMusic />
 
@@ -97,5 +97,5 @@ export default function RootLayout({
         <Analytics />
       </body>
     </html>
-  )
-}
+  );
+}क
