@@ -1,28 +1,16 @@
-// app/_not-found/page.tsx
 import Link from "next/link";
 
 export default function NotFound() {
   return (
     <div className="min-h-screen bg-[#0b1622] text-white flex flex-col items-center justify-center overflow-hidden p-4">
-
       {/* Sliding 404 header */}
       <div className="w-full overflow-hidden mb-10">
         <div className="flex animate-slide whitespace-nowrap text-6xl md:text-8xl font-extrabold opacity-90">
-
           <span className="mx-8 text-gray-400">Page</span>
-
-          <span className="mx-8 bg-gradient-to-r from-cyan-400 to-teal-400 text-transparent bg-clip-text">
-            404
-          </span>
-
+          <span className="mx-8 bg-gradient-to-r from-cyan-400 to-teal-400 text-transparent bg-clip-text">404</span>
           <span className="mx-8 text-gray-200">Missing Page</span>
-
-          <span className="mx-8 bg-gradient-to-r from-cyan-400 to-teal-400 text-transparent bg-clip-text">
-            404
-          </span>
-
+          <span className="mx-8 bg-gradient-to-r from-cyan-400 to-teal-400 text-transparent bg-clip-text">404</span>
           <span className="mx-8 text-gray-400">Page</span>
-
         </div>
       </div>
 
@@ -40,8 +28,13 @@ export default function NotFound() {
           Go to home page
         </Link>
 
+        <Link
+          href="/docs"
+          className="px-6 py-3 rounded-full border border-cyan-400 text-cyan-400 hover:bg-cyan-400 hover:text-black transition"
+        >
+          Check the docs
+        </Link>
       </div>
-
     </div>
   );
 }
