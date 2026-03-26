@@ -1,6 +1,19 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 
+// helper: format body safely
+function formatProject(body: any) {
+  return {
+    ...body,
+    tech_stack: Array.isArray(body.tech_stack)
+      ? body.tech_stack
+      : body.tech_stack
+      ? body.tech_stack.split(",").map((t: string) => t.trim())
+      : [],
+    updated_at: new Date().toISOString(),
+  }
+}
+
 // GET
 export async function GET() {
   try {
@@ -14,43 +27,54 @@ export async function GET() {
     if (error) throw error
 
     return NextResponse.json(data || [])
-  } catch (error) {
+  } catch (error: any) {
     console.error("Projects GET:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json(
+      { error: error.message || String(error) },
+      { status: 500 }
+    )
   }
 }
+
 // POST
-export async function POST(request) {
+export async function POST(request: Request) {
   try {
     const supabase = createClient()
     const body = await request.json()
 
+    const formattedBody = formatProject(body)
+
     const { data, error } = await supabase
       .from("projects")
-      .insert([body])
+      .insert([formattedBody])
       .select()
       .single()
 
     if (error) throw error
 
     return NextResponse.json(data, { status: 201 })
-  } catch (error) {
+  } catch (error: any) {
     console.error("Projects POST:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json(
+      { error: error.message || String(error) },
+      { status: 500 }
+    )
   }
 }
 
 // PUT
-export async function PUT(request) {
+export async function PUT(request: Request) {
   try {
     const supabase = createClient()
     const body = await request.json()
 
     if (!body.id) throw new Error("ID required")
 
+    const formattedBody = formatProject(body)
+
     const { data, error } = await supabase
       .from("projects")
-      .update(body)
+      .update(formattedBody)
       .eq("id", body.id)
       .select()
       .single()
@@ -58,14 +82,17 @@ export async function PUT(request) {
     if (error) throw error
 
     return NextResponse.json(data)
-  } catch (error) {
+  } catch (error: any) {
     console.error("Projects PUT:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json(
+      { error: error.message || String(error) },
+      { status: 500 }
+    )
   }
 }
 
 // DELETE
-export async function DELETE(request) {
+export async function DELETE(request: Request) {
   try {
     const supabase = createClient()
     const { searchParams } = new URL(request.url)
@@ -81,8 +108,11 @@ export async function DELETE(request) {
     if (error) throw error
 
     return NextResponse.json({ success: true })
-  } catch (error) {
+  } catch (error: any) {
     console.error("Projects DELETE:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json(
+      { error: error.message || String(error) },
+      { status: 500 }
+    )
   }
 }
